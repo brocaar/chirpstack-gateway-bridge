@@ -322,11 +322,20 @@ func (b *Backend) handleRouterInfo(r *http.Request, conn *connection) {
 		}
 		return
 	}
+	
+	host := strings.Split(r.Host, ":");
+
+	port := "80";
+	if len(host) > 1 {
+		port = host[1];
+	}
+
+	conn := fmt.Sprintf("%s:%s", host[0], port);
 
 	resp := structs.RouterInfoResponse{
 		Router: req.Router,
 		Muxs:   req.Router,
-		URI:    fmt.Sprintf("%s://%s/gateway/%s", b.scheme, r.Host, lorawan.EUI64(req.Router)),
+		URI:    fmt.Sprintf("%s://%s/gateway/%s", b.scheme, conn, lorawan.EUI64(req.Router)),
 	}
 
 	if r.TLS != nil && len(r.TLS.PeerCertificates) > 0 {
